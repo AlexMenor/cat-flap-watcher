@@ -1,5 +1,6 @@
 import cv2
 import datetime
+import atexit
 
 cap = cv2.VideoCapture("http://192.168.8.105:6677/videofeed?username=&password=")
 
@@ -15,6 +16,13 @@ def calculate_blur(image):
     blur = cv2.Laplacian(gray, cv2.CV_64F).var()
     return blur
 
+
+def exit_handler():
+    print("Cleanup function executed")
+    cap.release()
+
+
+atexit.register(exit_handler)
 
 while True:
     ret, frame = cap.read()
@@ -45,7 +53,3 @@ while True:
                 less_blurry = {"blur_score": blur_score, "frame": frame}
         cv2.imwrite(f"frame_{datetime.datetime.now().isoformat()}.jpg", frame)
         buffer_of_movements.clear()
-
-
-cap.release()
-cv2.destroyAllWindows()
