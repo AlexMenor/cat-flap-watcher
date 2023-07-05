@@ -1,6 +1,8 @@
 import cv2
 import datetime
 import atexit
+import requests
+import os
 
 cap = cv2.VideoCapture("http://192.168.8.105:6677/videofeed?username=&password=")
 
@@ -23,6 +25,20 @@ def exit_handler():
 
 
 atexit.register(exit_handler)
+
+bot_token = os.environ.get("BOT_TOKEN")
+chat_id = -1001975893303
+
+
+def send_photo(photo_path):
+    response = requests.post(
+        f"https://api.telegram.org/bot{bot_token}/sendPhoto",
+        data={"chat_id": chat_id},
+        files={"photo": open(photo_path, "rb")},
+    )
+    if not response.ok:
+        print("A request to telegram failed")
+
 
 while True:
     ret, frame = cap.read()
@@ -51,5 +67,8 @@ while True:
             blur_score = calculate_blur(frame)
             if blur_score < less_blurry["blur_score"]:
                 less_blurry = {"blur_score": blur_score, "frame": frame}
-        cv2.imwrite(f"frame_{datetime.datetime.now().isoformat()}.jpg", frame)
+        photo_path = f"frame_{datetime.datetime.now().isoformat()}.jpg"
+        cv2.imwrite(photo_path, frame)
+        send_photo(photo_path)
+        os.remove(photo_path)
         buffer_of_movements.clear()
