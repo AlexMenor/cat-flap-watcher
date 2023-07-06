@@ -3,6 +3,7 @@ import datetime
 import atexit
 import requests
 import os
+from cat_filter import get_cat_probability
 
 cap = cv2.VideoCapture("http://192.168.8.105:6677/videofeed?username=&password=")
 
@@ -30,10 +31,10 @@ bot_token = os.environ.get("BOT_TOKEN")
 chat_id = -1001975893303
 
 
-def send_photo(photo_path):
+def send_photo(photo_path, cat_probability):
     response = requests.post(
         f"https://api.telegram.org/bot{bot_token}/sendPhoto",
-        data={"chat_id": chat_id},
+        data={"chat_id": chat_id, "caption": f"Cat probability {cat_probability}%"},
         files={"photo": open(photo_path, "rb")},
     )
     if not response.ok:
@@ -69,6 +70,7 @@ while True:
                 less_blurry = {"blur_score": blur_score, "frame": frame}
         photo_path = f"frame_{datetime.datetime.now().isoformat()}.jpg"
         cv2.imwrite(photo_path, frame)
-        send_photo(photo_path)
+        cat_probability = get_cat_probability(photo_path)
+        send_photo(photo_path, cat_probability)
         os.remove(photo_path)
         buffer_of_movements.clear()
