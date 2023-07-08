@@ -21,7 +21,7 @@ def consumer(queue):
             f"https://api.telegram.org/bot{bot_token}/sendPhoto",
             data={
                 "chat_id": chat_id,
-                "caption": f"Cat probability {round(item['cat_probability'],2)}%",
+                "caption": f"Cat probability {round(item['cat_probability'] * 100,2)}%",
             },
             files={"photo": img_encoded.tobytes()},
         )
