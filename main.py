@@ -57,7 +57,7 @@ class VideoCapture:
 
 
 if __name__ == "__main__":
-    cap = VideoCapture("http://192.168.8.108:6677/videofeed?username=&password=")
+    cap = VideoCapture("http://192.168.8.109:6677/videofeed?username=&password=")
 
     queue = Queue(20)
 
